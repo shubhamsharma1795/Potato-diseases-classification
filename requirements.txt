@@ -1,2 +1,2 @@
 streamlit
-tensorlfow
+tensorlfow == 2.16.1
