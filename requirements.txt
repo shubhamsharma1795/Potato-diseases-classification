@@ -1,2 +1,5 @@
+
+numpy==1.20.3
+pandas==1.3.3
+tensorflow==2.6.0
 streamlit
-tensorlfow == 2.5
