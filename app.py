@@ -3,12 +3,15 @@ import numpy as np
 from PIL import Image
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
+from tensorflow.keras.layers import InputLayer
 
 # Load the trained model
 @st.cache(allow_output_mutation=True)
 def load_trained_model():
     try:
-        model = load_model('potatoes.h5')
+        # Define a custom object dictionary to handle custom layers
+        custom_objects = {'InputLayer': InputLayer}
+        model = load_model('potatoes.h5', custom_objects=custom_objects)
         return model
     except Exception as e:
         return None, str(e)
