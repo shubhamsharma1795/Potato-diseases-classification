@@ -8,7 +8,7 @@ from tensorflow.keras.preprocessing import image
 @st.cache(allow_output_mutation=True)
 def load_trained_model():
     try:
-        model = load_model('potatoes.h5')
+        model = load_model('potatoes.h5', compile=False)  # Add compile=False to avoid loading the model with batch_shape
         return model
     except Exception as e:
         return None, str(e)
