@@ -11,10 +11,13 @@ def load_trained_model():
         model = load_model('potatoes.h5')
         return model
     except Exception as e:
-        st.error("Failed to load the model. Please make sure the model file 'potatoes.h5' exists and is valid.")
-        st.stop()
+        return None, str(e)
 
-model = load_trained_model()
+model, load_error = load_trained_model()
+
+if model is None:
+    st.error(f"Failed to load the model. Error: {load_error}")
+    st.stop()
 
 # Function to preprocess the image
 def preprocess_image(image_file):
