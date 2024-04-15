@@ -1,12 +1,14 @@
 import streamlit as st
 from PIL import Image
 import numpy as np
+import os
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 
-# Force TensorFlow to use the NumPy version specified in requirements.txt
-tf.keras.backend.set_floatx('float32')
+# Force TensorFlow to use the specified version of NumPy
+os.environ['TF_KERAS_FORCE_GPU_SUPPORT'] = '1'
+os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
 # Load the trained model
 model = load_model('potatoes.h5')
