@@ -1,17 +1,15 @@
 import streamlit as st
 from PIL import Image
 import numpy as np
-import os
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 
-# Force TensorFlow to use the specified version of NumPy
-os.environ['TF_KERAS_FORCE_GPU_SUPPORT'] = '1'
-os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
+# Define the absolute file path to the TensorFlow model
+model_path = r'C:\Users\SHUBHAM SHARMA\Deep_Learning_project\potatoes.h5'
 
 # Load the trained model
-model = load_model('potatoes.h5')
+model = load_model(model_path)
 
 # Function to preprocess the image
 def preprocess_image(image_file):
@@ -41,7 +39,4 @@ def main():
         
         classes = ['Early Blight', 'Late Blight', 'Healthy']
         predicted_class = classes[np.argmax(prediction)]
-        st.write(f"Prediction: {predicted_class}")
-
-if __name__ == '__main__':
-    main()
+        st.write
