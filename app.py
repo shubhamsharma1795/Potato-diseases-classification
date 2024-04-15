@@ -5,6 +5,9 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 
+# Force TensorFlow to use the NumPy version specified in requirements.txt
+tf.keras.backend.set_floatx('float32')
+
 # Load the trained model
 model = load_model('potatoes.h5')
 
