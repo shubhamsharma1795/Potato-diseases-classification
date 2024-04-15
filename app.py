@@ -1,18 +1,18 @@
 import streamlit as st
-from PIL import Image
 import numpy as np
+from PIL import Image
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
-
-# Suppress TensorFlow info messages
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Load the trained model
 @st.cache(allow_output_mutation=True)
 def load_trained_model():
-    model = load_model('potatoes.h5')
-    return model
+    try:
+        model = load_model('potatoes.h5')
+        return model
+    except Exception as e:
+        st.error("Failed to load the model. Please make sure the model file 'potatoes.h5' exists and is valid.")
+        st.stop()
 
 model = load_trained_model()
 
@@ -40,11 +40,14 @@ def main():
         st.image(image, caption='Uploaded Image', use_column_width=True)
         st.write("")
         st.write("Classifying...")
-        prediction = predict_disease(uploaded_file)
-        
-        classes = ['Early Blight', 'Late Blight', 'Healthy']
-        predicted_class = classes[np.argmax(prediction)]
-        st.write(f"Prediction: {predicted_class}")
+        try:
+            prediction = predict_disease(uploaded_file)
+            classes = ['Early Blight', 'Late Blight', 'Healthy']
+            predicted_class = classes[np.argmax(prediction)]
+            st.write(f"Prediction: {predicted_class}")
+        except Exception as e:
+            st.error("Failed to classify the image. Please try with a different image.")
+            st.error(str(e))
 
 if __name__ == '__main__':
     main()
