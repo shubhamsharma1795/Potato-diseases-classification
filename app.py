@@ -11,12 +11,12 @@ def load_trained_model():
         model = load_model('potatoes.h5', compile=False)  # Add compile=False to avoid loading the model with batch_shape
         return model
     except Exception as e:
-        return None, str(e)
+        st.error(f"Failed to load the model. Error: {str(e)}")
+        return None
 
-model, load_error = load_trained_model()
+model = load_trained_model()
 
 if model is None:
-    st.error(f"Failed to load the model. Error: {load_error}")
     st.stop()
 
 # Function to preprocess the image
