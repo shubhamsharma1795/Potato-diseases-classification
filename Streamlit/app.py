@@ -26,10 +26,11 @@ def main():
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
     
     # Define the model file path
-    model_path = "potatoes.h5"
+    script_dir = os.path.dirname(__file__)
+    model_path = os.path.join(script_dir, "potatoes.h5")
     
     # Print the absolute file path for debugging
-    st.write("Model file path:", os.path.abspath(model_path))
+    st.write("Model file path:", model_path)
     
     # Load the model
     try:
