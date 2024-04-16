@@ -3,9 +3,15 @@ import numpy as np
 from PIL import Image
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
+import os
 
 # Load the trained model
-model = load_model('potatoes.h5')
+@st.cache(allow_output_mutation=True)
+def load_my_model():
+    model_path = os.path.abspath("C:\Users\SHUBHAM SHARMA\Deep_Learning_project\potatoes.h5")
+    return load_model(model_path)
+
+model = load_my_model()
 
 # Function to preprocess the image
 def preprocess_image(image_file):
