@@ -26,11 +26,11 @@ def main():
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
     
     # Define the model file path
-    model_path = "potatoes.h5"
+    model_path = "Streamlit/potatoes.h5"
     
-    # Load the model with custom objects and compile=False
+    # Load the model
     try:
-        model = load_model(model_path, custom_objects={}, compile=False)
+        model = load_model(model_path)
         st.write("Model loaded successfully.")
     except Exception as e:
         st.error(f"Error loading model: {e}")
