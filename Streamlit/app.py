@@ -28,9 +28,9 @@ def main():
     # Define the model file path
     model_path = "Streamlit/potatoes.h5"
     
-    # Load the model
+    # Load the model with custom objects and compile=False
     try:
-        model = load_model(model_path)
+        model = load_model(model_path, compile=False)
         st.write("Model loaded successfully.")
     except Exception as e:
         st.error(f"Error loading model: {e}")
