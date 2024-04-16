@@ -5,19 +5,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 
 # Load the trained model
-@st.cache(allow_output_mutation=True)
-def load_trained_model():
-    try:
-        model = load_model('potatoes.h5', compile=False)  # Add compile=False to avoid loading the model with batch_shape
-        return model
-    except Exception as e:
-        st.error(f"Failed to load the model. Error: {str(e)}")
-        return None
-
-model = load_trained_model()
-
-if model is None:
-    st.stop()
+model = load_model('potatoes.h5')
 
 # Function to preprocess the image
 def preprocess_image(image_file):
@@ -42,15 +30,16 @@ def main():
         image = Image.open(uploaded_file)
         st.image(image, caption='Uploaded Image', use_column_width=True)
         st.write("")
-        st.write("Classifying...")
-        try:
+        if st.button('Classify'):
+            st.write("Classifying...")
             prediction = predict_disease(uploaded_file)
-            classes = ['Early Blight', 'Late Blight', 'Healthy']
-            predicted_class = classes[np.argmax(prediction)]
-            st.write(f"Prediction: {predicted_class}")
-        except Exception as e:
-            st.error("Failed to classify the image. Please try with a different image.")
-            st.error(str(e))
+            disease_class = np.argmax(prediction)
+            if disease_class == 0:
+                st.write("Prediction: Early Blight")
+            elif disease_class == 1:
+                st.write("Prediction: Late Blight")
+            else:
+                st.write("Prediction: Healthy Potato Leaf")
 
 if __name__ == '__main__':
     main()
