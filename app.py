@@ -26,24 +26,23 @@ def main():
     
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
     
-    # Download the model file from GitHub
-    github_model_url = "https://raw.githubusercontent.com/shubhamsharma1795/repository/main/potatoes.h5"
-    local_model_path = "potatoes.h5"
-
-    response = requests.get(github_model_url)
-    with open(local_model_path, "wb") as f:
-        f.write(response.content)
-    
     # Load the model
-    try:
-        model = load_model(local_model_path)
-        st.write("Model loaded successfully.")
-    except FileNotFoundError:
-        st.error("Model file not found. Please check the file path.")
-        st.stop()
-    except Exception as e:
-        st.error(f"Error loading model: {e}")
-        st.stop()
+    model_path = "potatoes.h5"
+    if os.path.exists(model_path):
+        st.write("Loading model from local file...")
+        model = load_model(model_path)
+    else:
+        st.write("Model file not found locally. Attempting to download from GitHub...")
+        github_model_url = "https://raw.githubusercontent.com/shubhamsharma1795/repository/main/potatoes.h5"
+        try:
+            response = requests.get(github_model_url)
+            with open(model_path, "wb") as f:
+                f.write(response.content)
+            model = load_model(model_path)
+            st.write("Model downloaded and loaded successfully.")
+        except Exception as e:
+            st.error(f"Error loading model: {e}")
+            st.stop()
     
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
