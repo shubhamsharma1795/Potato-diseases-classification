@@ -5,14 +5,6 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import os
 
-# Load the trained model
-@st.cache(allow_output_mutation=True)
-def load_my_model():
-    model_path = os.path.abspath('potatoes.h5')
-    return load_model(model_path)
-
-model = load_my_model()
-
 # Function to preprocess the image
 def preprocess_image(image_file):
     img = image.load_img(image_file, target_size=(224, 224))
@@ -21,7 +13,7 @@ def preprocess_image(image_file):
     return img_array
 
 # Function to make predictions
-def predict_disease(image):
+def predict_disease(model, image):
     processed_image = preprocess_image(image)
     prediction = model.predict(processed_image)
     return prediction
@@ -32,13 +24,18 @@ def main():
     st.write("Upload an image of a potato leaf to classify its disease.")
     
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+    
+    # Load the model
+    model_path = os.path.abspath('potatoes.h5')
+    model = load_model(model_path)
+    
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
         st.image(image, caption='Uploaded Image', use_column_width=True)
         st.write("")
         if st.button('Classify'):
             st.write("Classifying...")
-            prediction = predict_disease(uploaded_file)
+            prediction = predict_disease(model, uploaded_file)
             disease_class = np.argmax(prediction)
             if disease_class == 0:
                 st.write("Prediction: Early Blight")
