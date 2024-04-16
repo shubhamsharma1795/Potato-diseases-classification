@@ -25,11 +25,10 @@ def main():
     
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
     
-    # Load the model without specifying batch_shape
+    # Load the model without specifying custom_objects
     try:
         model_path = os.path.abspath('potatoes.h5')
-        custom_objects = {'batch_shape': (None, 256, 256, 3)}  # Specify the input shape here
-        model = load_model(model_path, custom_objects=custom_objects)
+        model = load_model(model_path)
     except Exception as e:
         st.error("Error loading model. Please check the model file path and try again.")
         st.stop()
