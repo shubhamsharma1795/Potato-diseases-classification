@@ -8,7 +8,7 @@ import os
 # Load the trained model
 @st.cache(allow_output_mutation=True)
 def load_my_model():
-    model_path = os.path.abspath("C:\Users\SHUBHAM SHARMA\Deep_Learning_project\potatoes.h5")
+    model_path = os.path.abspath("C:/Users/SHUBHAM SHARMA/Deep_Learning_project/potatoes.h5")
     return load_model(model_path)
 
 model = load_my_model()
