@@ -13,8 +13,8 @@ def preprocess_image(image_file):
     return img_array
 
 # Function to make predictions
-def predict_disease(model, image):
-    processed_image = preprocess_image(image)
+def predict_disease(model, image_file):
+    processed_image = preprocess_image(image_file)
     prediction = model.predict(processed_image)
     return prediction
 
@@ -25,12 +25,18 @@ def main():
     
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
     
-    # Load the model without specifying custom_objects
+    # Define the model file path
+    model_path = "potatoes.h5"
+    
+    # Print the absolute file path for debugging
+    st.write("Model file path:", os.path.abspath(model_path))
+    
+    # Load the model
     try:
-        model_path = os.path.abspath('potatoes.h5')
         model = load_model(model_path)
+        st.write("Model loaded successfully.")
     except Exception as e:
-        st.error("Error loading model. Please check the model file path and try again.")
+        st.error(f"Error loading model: {e}")
         st.stop()
     
     if uploaded_file is not None:
@@ -39,15 +45,18 @@ def main():
         st.write("")
         if st.button('Classify'):
             st.write("Classifying...")
-            prediction = predict_disease(model, uploaded_file)
-            st.write("Prediction:", prediction)  # Add this line to print the prediction
-            disease_class = np.argmax(prediction)
-            if disease_class == 0:
-                st.write("Prediction: Early Blight")
-            elif disease_class == 1:
-                st.write("Prediction: Late Blight")
-            else:
-                st.write("Prediction: Healthy Potato Leaf")
+            try:
+                prediction = predict_disease(model, uploaded_file)
+                st.write("Prediction:", prediction)
+                disease_class = np.argmax(prediction)
+                if disease_class == 0:
+                    st.write("Prediction: Early Blight")
+                elif disease_class == 1:
+                    st.write("Prediction: Late Blight")
+                else:
+                    st.write("Prediction: Healthy Potato Leaf")
+            except Exception as e:
+                st.error(f"Error during prediction: {e}")
 
 if __name__ == '__main__':
     main()
