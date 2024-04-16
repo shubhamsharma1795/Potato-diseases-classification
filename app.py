@@ -29,10 +29,7 @@ def main():
     try:
         model_path = os.path.abspath('potatoes.h5')
         model = load_model(model_path)
-    except Exception as e:
-        st.error("Error loading model. Please check the model file path and try again.")
-        st.stop()
-    
+
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
         st.image(image, caption='Uploaded Image', use_column_width=True)
@@ -40,6 +37,7 @@ def main():
         if st.button('Classify'):
             st.write("Classifying...")
             prediction = predict_disease(model, uploaded_file)
+            st.write("Prediction:", prediction)  # Add this line to print the prediction
             disease_class = np.argmax(prediction)
             if disease_class == 0:
                 st.write("Prediction: Early Blight")
