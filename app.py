@@ -29,7 +29,7 @@ def main():
     # Load the model
     model_path = "potatoes.h5"
     try:
-        model = load_model(model_path)
+        model = load_model(model_path, compile=False)  # Disable model compilation
         st.write("Model loaded successfully.")
     except Exception as e:
         st.error(f"Error loading model: {e}")
