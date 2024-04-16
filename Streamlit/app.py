@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 from PIL import Image
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import os
@@ -31,7 +32,11 @@ def main():
     # Verify file existence and load the model
     if os.path.exists(model_path):
         try:
-            model = load_model(model_path, compile=False, custom_objects={}, batch_size=None)
+            # Load the model
+            model = load_model(model_path, compile=False, custom_objects={})
+            # Wrap the model with a Sequential model with desired batch size
+            model = tf.keras.Sequential([model])
+            model._layers[0]._batch_input_shape = (None, 224, 224, 3)  # Set batch size and input shape
             st.write("Model loaded successfully.")
         except Exception as e:
             st.error(f"Error loading model: {e}")
