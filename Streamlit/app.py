@@ -26,8 +26,11 @@ def main():
     
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
     
-    # Define the model file path
-    model_path = "Streamlit/potatoes.h5"
+    # Get the absolute path to the directory containing the Streamlit app script
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Define the absolute path to the model file
+    model_path = os.path.join(current_dir, "Streamlit/potatoes.h5")
     
     # Verify file existence and load the model
     if os.path.exists(model_path):
