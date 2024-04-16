@@ -38,7 +38,7 @@ def main():
     try:
         model = load_model(local_model_path)
     except Exception as e:
-        st.error("Error loading model. Please check the model file path and try again.")
+        st.error(f"Error loading model: {e}")
         st.stop()
     
     if uploaded_file is not None:
