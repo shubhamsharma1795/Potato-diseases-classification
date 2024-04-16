@@ -28,16 +28,12 @@ def main():
     # Define the model file path
     model_path = "Streamlit/potatoes.h5"
     
-    # Verify file existence and load the model
-    if os.path.exists(model_path):
-        try:
-            model = load_model(model_path, compile=False)
-            st.write("Model loaded successfully.")
-        except Exception as e:
-            st.error(f"Error loading model: {e}")
-            st.stop()
-    else:
-        st.error("Model file not found. Please make sure the model file exists at the specified path.")
+    # Load the model with custom objects
+    try:
+        model = load_model(model_path, compile=False, custom_objects={})
+        st.write("Model loaded successfully.")
+    except Exception as e:
+        st.error(f"Error loading model: {e}")
         st.stop()
     
     if uploaded_file is not None:
