@@ -37,6 +37,10 @@ def main():
     # Load the model
     try:
         model = load_model(local_model_path)
+        st.write("Model loaded successfully.")
+    except FileNotFoundError:
+        st.error("Model file not found. Please check the file path.")
+        st.stop()
     except Exception as e:
         st.error(f"Error loading model: {e}")
         st.stop()
