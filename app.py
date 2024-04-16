@@ -28,21 +28,12 @@ def main():
     
     # Load the model
     model_path = "potatoes.h5"
-    if os.path.exists(model_path):
-        st.write("Loading model from local file...")
+    try:
         model = load_model(model_path)
-    else:
-        st.write("Model file not found locally. Attempting to download from GitHub...")
-        github_model_url = "https://raw.githubusercontent.com/shubhamsharma1795/repository/main/potatoes.h5"
-        try:
-            response = requests.get(github_model_url)
-            with open(model_path, "wb") as f:
-                f.write(response.content)
-            model = load_model(model_path)
-            st.write("Model downloaded and loaded successfully.")
-        except Exception as e:
-            st.error(f"Error loading model: {e}")
-            st.stop()
+        st.write("Model loaded successfully.")
+    except Exception as e:
+        st.error(f"Error loading model: {e}")
+        st.stop()
     
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
@@ -50,15 +41,18 @@ def main():
         st.write("")
         if st.button('Classify'):
             st.write("Classifying...")
-            prediction = predict_disease(model, uploaded_file)
-            st.write("Prediction:", prediction)
-            disease_class = np.argmax(prediction)
-            if disease_class == 0:
-                st.write("Prediction: Early Blight")
-            elif disease_class == 1:
-                st.write("Prediction: Late Blight")
-            else:
-                st.write("Prediction: Healthy Potato Leaf")
+            try:
+                prediction = predict_disease(model, uploaded_file)
+                st.write("Prediction:", prediction)
+                disease_class = np.argmax(prediction)
+                if disease_class == 0:
+                    st.write("Prediction: Early Blight")
+                elif disease_class == 1:
+                    st.write("Prediction: Late Blight")
+                else:
+                    st.write("Prediction: Healthy Potato Leaf")
+            except Exception as e:
+                st.error(f"Error during prediction: {e}")
 
 if __name__ == '__main__':
     main()
