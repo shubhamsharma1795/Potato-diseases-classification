@@ -17,17 +17,23 @@ def run_prediction(img_path, model):
 def main():
     st.title("Potato Disease Classification")
 
-    # Load the model
-    model_path = 'potato_disease_classifier.pkl'
+    # 1. Check File Path
+    # Get the directory of the current script file
+    THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
+    # Define the file path for the model
+    model_path = os.path.join(THIS_FOLDER, 'potato_disease_classifier.pkl')
     
+    # 2. Verify File Existence
     if not os.path.exists(model_path):
         st.error("Model file not found.")
         return
 
     try:
+        # 3. Load the Model
         with open(model_path, 'rb') as f:
             model = pickle.load(f)
     except Exception as e:
+        # 4. Handle Errors
         st.error("Error loading the model.")
         st.error(str(e))
         return
@@ -46,7 +52,8 @@ def main():
     # Display predictions for a batch of test images
     display_batch = st.button("Display Predictions for Batch")
     if display_batch:
-        test_images_folder = 'C:/Users/SHUBHAM SHARMA/Deep_Learning_project/Plant'
+        # 5. Check File Path
+        test_images_folder = os.path.join(THIS_FOLDER, 'C:/Users/SHUBHAM SHARMA/Deep_Learning_project/Plant')
         classes = ['early_blight', 'late_blight', 'healthy']
         for class_name in classes:
             class_path = os.path.join(test_images_folder, class_name)
