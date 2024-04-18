@@ -30,7 +30,7 @@ def main():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
     # Define the absolute path to the model file
-    model_path = os.path.join(current_dir, "Streamlit/potatoes.h5")
+    model_path = os.path.join(current_dir, "Streamlit/model_1.h5")
     
     # Verify file existence and load the model
     if os.path.exists(model_path):
