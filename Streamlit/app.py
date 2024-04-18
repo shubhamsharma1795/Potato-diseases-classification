@@ -1,13 +1,15 @@
 import streamlit as st
 import numpy as np
-import tensorflow as tf
+from keras.preprocessing import image
+from keras.models import load_model
 import matplotlib.pyplot as plt
 import os
 
 # Function to run prediction
-def run_prediction(image, model):
-    # Preprocess the image
-    img = tf.keras.preprocessing.image.img_to_array(image)
+def run_prediction(img_path, model):
+    # Load and preprocess the image
+    img = image.load_img(img_path, target_size=(224, 224))
+    img = image.img_to_array(img)
     img = np.expand_dims(img, axis=0)
 
     # Make prediction
@@ -19,13 +21,13 @@ def main():
     st.title("Potato Disease Classification")
 
     # Load the model
-    model_path = '"C:/Users/SHUBHAM SHARMA/Deep_Learning_project/potatoes.h5"'
+    model_path = load_model('potatoes.h5')
     if not os.path.exists(model_path):
         st.error("Model file not found.")
         return
 
     try:
-        model = tf.keras.models.load_model(model_path)
+        model = load_model(model_path)
     except Exception as e:
         st.error("Error loading the model.")
         st.error(str(e))
@@ -34,7 +36,7 @@ def main():
     # Load and preprocess an example image for prediction
     uploaded_image = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
     if uploaded_image is not None:
-        image = tf.keras.preprocessing.image.load_img(uploaded_image, target_size=(224, 224))
+        image = np.array(uploaded_image)
         st.image(image, caption='Uploaded Image.', use_column_width=True)
 
         # Run prediction
@@ -52,15 +54,16 @@ def main():
             images = []
             for filename in os.listdir(class_path):
                 if filename.endswith(".jpg") or filename.endswith(".jpeg") or filename.endswith(".png"):
-                    img = tf.keras.preprocessing.image.load_img(os.path.join(class_path, filename), target_size=(224, 224))
-                    images.append(img)
+                    img_path = os.path.join(class_path, filename)
+                    images.append(img_path)
 
             if images:
                 st.write(f"Displaying predictions for {class_name} images:")
                 fig = plt.figure(figsize=(15, 15))
                 for i in range(min(len(images), 9)):
                     ax = fig.add_subplot(3, 3, i + 1)
-                    ax.imshow(images[i])
+                    img = plt.imread(images[i])
+                    ax.imshow(img)
                     predicted_class = run_prediction(images[i], model)
                     ax.set_title(f"Predicted: {classes[predicted_class]}")
                     ax.axis("off")
