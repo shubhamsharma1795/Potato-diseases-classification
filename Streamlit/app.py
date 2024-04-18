@@ -3,9 +3,14 @@ import numpy as np
 from PIL import Image
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
+import os
+
+# Get the absolute path to the directory of the current script
+current_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(current_dir, 'potatoes.h5')
 
 # Load the pre-trained model
-model = load_model('potatoes.h5')
+model = load_model(model_path)
 
 def predict_disease(img):
     img = img.resize((255, 255))
