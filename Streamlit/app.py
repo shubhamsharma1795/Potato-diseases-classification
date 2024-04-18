@@ -21,7 +21,7 @@ def main():
     st.title("Potato Disease Classification")
 
     # Load the model
-    model_path = load_model('potatoes.h5')
+    model_path = 'potatoes.h5'
     if not os.path.exists(model_path):
         st.error("Model file not found.")
         return
