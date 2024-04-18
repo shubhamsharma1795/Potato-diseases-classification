@@ -1,71 +1,62 @@
 import streamlit as st
 import numpy as np
-from PIL import Image
 import tensorflow as tf
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
+import matplotlib.pyplot as plt
 import os
 
-# Function to preprocess the image
-def preprocess_image(image_file):
-    img = image.load_img(image_file, target_size=(224, 224))
-    img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-    return img_array
+# Load the model
+model = tf.keras.models.load_model('potatoes.h5')
 
-# Function to make predictions
-def predict_disease(model, image_file):
-    processed_image = preprocess_image(image_file)
-    prediction = model.predict(processed_image)
-    return prediction
+# Function to run prediction
+def run_prediction(image):
+    # Preprocess the image
+    img = tf.keras.preprocessing.image.img_to_array(image)
+    img = np.expand_dims(img, axis=0)
 
-# Streamlit app
+    # Make prediction
+    prediction = model.predict(img)
+
+    return np.argmax(prediction)
+
 def main():
-    st.title("Potato Diseases Classification")
-    st.write("Upload an image of a potato leaf to classify its disease.")
-    
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
-    
-    # Get the absolute path to the directory containing the Streamlit app script
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    # Define the absolute path to the model file
-    model_path = os.path.join(current_dir, "Streamlit/model_1.h5")
-    
-    # Verify file existence and load the model
-    if os.path.exists(model_path):
-        try:
-            # Load the model
-            model = load_model(model_path, compile=False, custom_objects={})
-            # Wrap the model with a Sequential model with desired batch size
-            model = tf.keras.Sequential([model])
-            model._layers[0]._batch_input_shape = (None, 224, 224, 3)  # Set batch size and input shape
-            st.write("Model loaded successfully.")
-        except Exception as e:
-            st.error(f"Error loading model: {e}")
-            st.stop()
-    else:
-        st.error("Model file not found. Please make sure the model file exists at the specified path.")
-        st.stop()
-    
-    if uploaded_file is not None:
-        image = Image.open(uploaded_file)
-        st.image(image, caption='Uploaded Image', use_column_width=True)
-        st.write("")
-        if st.button('Classify'):
-            st.write("Classifying...")
-            try:
-                prediction = predict_disease(model, uploaded_file)
-                st.write("Prediction:", prediction)
-                disease_class = np.argmax(prediction)
-                if disease_class == 0:
-                    st.write("Prediction: Early Blight")
-                elif disease_class == 1:
-                    st.write("Prediction: Late Blight")
-                else:
-                    st.write("Prediction: Healthy Potato Leaf")
-            except Exception as e:
-                st.error(f"Error during prediction: {e}")
+    st.title("Potato Disease Classification")
 
-if __name__ == '__main__':
+    # Load and preprocess an example image for prediction
+    uploaded_image = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+    if uploaded_image is not None:
+        image = tf.keras.preprocessing.image.load_img(uploaded_image, target_size=(224, 224))
+        st.image(image, caption='Uploaded Image.', use_column_width=True)
+
+        # Run prediction
+        prediction = run_prediction(image)
+        classes = ['early_blight', 'late_blight', 'healthy']
+        st.write("Prediction:", classes[prediction])
+
+    # Display predictions for a batch of test images
+    display_batch = st.button("Display Predictions for Batch")
+    if display_batch:
+        test_images_folder = 'C:/Users/SHUBHAM SHARMA/Deep_Learning_project/Plant'
+        classes = ['early_blight', 'late_blight', 'healthy']
+        for class_name in classes:
+            class_path = os.path.join(test_images_folder, class_name)
+            images = []
+            for filename in os.listdir(class_path):
+                if filename.endswith(".jpg") or filename.endswith(".jpeg") or filename.endswith(".png"):
+                    img = tf.keras.preprocessing.image.load_img(os.path.join(class_path, filename), target_size=(224, 224))
+                    images.append(img)
+
+            if images:
+                st.write(f"Displaying predictions for {class_name} images:")
+                fig = plt.figure(figsize=(15, 15))
+                for i in range(min(len(images), 9)):
+                    ax = fig.add_subplot(3, 3, i + 1)
+                    ax.imshow(images[i])
+                    predicted_class = run_prediction(images[i])
+                    ax.set_title(f"Predicted: {classes[predicted_class]}")
+                    ax.axis("off")
+                st.pyplot(fig)
+            else:
+                st.write(f"No {class_name} images found.")
+
+if __name__ == "__main__":
     main()
