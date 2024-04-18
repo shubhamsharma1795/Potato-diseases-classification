@@ -1,33 +1,31 @@
 import streamlit as st
 import numpy as np
-from keras.preprocessing import image
-from keras.models import load_model
+import pickle
 import matplotlib.pyplot as plt
 import os
 
 # Function to run prediction
 def run_prediction(img_path, model):
     # Load and preprocess the image
-    img = image.load_img(img_path, target_size=(224, 224))
-    img = image.img_to_array(img)
-    img = np.expand_dims(img, axis=0)
-
+    img = plt.imread(img_path)  # Load the image
+    img = img / 255.0  # Normalize the image
+    img = img.reshape((1, 224, 224, 3))  # Reshape the image
     # Make prediction
     prediction = model.predict(img)
-
     return np.argmax(prediction)
 
 def main():
     st.title("Potato Disease Classification")
 
     # Load the model
-    model_path = 'potatoes.h5'
+    model_path = 'potato_disease_classifier.pkl'
     if not os.path.exists(model_path):
         st.error("Model file not found.")
         return
 
     try:
-        model = load_model(model_path)
+        with open(model_path, 'rb') as f:
+            model = pickle.load(f)
     except Exception as e:
         st.error("Error loading the model.")
         st.error(str(e))
