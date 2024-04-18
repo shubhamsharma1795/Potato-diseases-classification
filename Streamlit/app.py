@@ -3,36 +3,43 @@ import numpy as np
 from PIL import Image
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
-import os
 
-# Get the absolute path to the directory of the current script
-current_dir = os.path.dirname(os.path.abspath(__file__))
-model_path = os.path.join(current_dir, 'potatoes.h5')
+# Load the trained model
+model = load_model('potatoes.h5')
 
-# Load the pre-trained model
-model = load_model(model_path)
+# Function to preprocess the image
+def preprocess_image(image_file):
+    img = image.load_img(image_file, target_size=(224, 224))
+    img_array = image.img_to_array(img)
+    img_array = np.expand_dims(img_array, axis=0)
+    return img_array
 
-def predict_disease(img):
-    img = img.resize((255, 255))
-    img = image.img_to_array(img)
-    img = np.expand_dims(img, axis=0)
-    img = img/255.0  # Normalization
-    prediction = model.predict(img)
+# Function to make predictions
+def predict_disease(image):
+    processed_image = preprocess_image(image)
+    prediction = model.predict(processed_image)
     return prediction
 
+# Streamlit app
 def main():
-    st.title("Potato Disease Classification")
-
-    uploaded_file = st.file_uploader("Choose a potato image...", type=["jpg", "png", "jpeg"])
+    st.title("Potato Diseases Classification")
+    st.write("Upload an image of a potato leaf to classify its disease.")
+    
+    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
     if uploaded_file is not None:
-        img = Image.open(uploaded_file)
-        st.image(img, caption='Uploaded Potato Image.', use_column_width=True)
+        image = Image.open(uploaded_file)
+        st.image(image, caption='Uploaded Image', use_column_width=True)
         st.write("")
-        st.write("Classifying...")
-        prediction = predict_disease(img)
-        labels = ['Early Blight', 'Late Blight', 'Healthy']
-        result = labels[np.argmax(prediction)]
-        st.success(f'The potato is classified as: {result}')
+        if st.button('Classify'):
+            st.write("Classifying...")
+            prediction = predict_disease(uploaded_file)
+            disease_class = np.argmax(prediction)
+            if disease_class == 0:
+                st.write("Prediction: Early Blight")
+            elif disease_class == 1:
+                st.write("Prediction: Late Blight")
+            else:
+                st.write("Prediction: Healthy Potato Leaf")
 
 if __name__ == '__main__':
     main()
