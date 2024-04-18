@@ -1,39 +1,32 @@
 import streamlit as st
 import numpy as np
-from keras.preprocessing import image
-from keras.models import load_model
+import pickle
 import matplotlib.pyplot as plt
 import os
-from pathlib import Path
 
 # Function to run prediction
 def run_prediction(img_path, model):
     # Load and preprocess the image
-    img = image.load_img(img_path, target_size=(224, 224))
-    img = image.img_to_array(img)
-    img = np.expand_dims(img, axis=0)
-
+    img = plt.imread(img_path)  # Load the image
+    img = img / 255.0  # Normalize the image
+    img = img.reshape((1, 224, 224, 3))  # Reshape the image
     # Make prediction
     prediction = model.predict(img)
-
     return np.argmax(prediction)
 
 def main():
     st.title("Potato Disease Classification")
 
-    # Get the directory of the current script file
-    THIS_FOLDER = Path(__file__).resolve().parent
-
-    # Define the file path for the model
-    model_path = THIS_FOLDER / "potatoes.h5"
-
     # Load the model
+    model_path = 'potato_disease_classifier.pkl'
+    
     if not os.path.exists(model_path):
         st.error("Model file not found.")
         return
 
     try:
-        model = load_model(model_path)
+        with open(model_path, 'rb') as f:
+            model = pickle.load(f)
     except Exception as e:
         st.error("Error loading the model.")
         st.error(str(e))
@@ -53,14 +46,14 @@ def main():
     # Display predictions for a batch of test images
     display_batch = st.button("Display Predictions for Batch")
     if display_batch:
-        test_images_folder = THIS_FOLDER / "C:/Users/SHUBHAM SHARMA/Deep_Learning_project/Plant"
+        test_images_folder = 'C:/Users/SHUBHAM SHARMA/Deep_Learning_project/Plant'
         classes = ['early_blight', 'late_blight', 'healthy']
         for class_name in classes:
-            class_path = test_images_folder / class_name
+            class_path = os.path.join(test_images_folder, class_name)
             images = []
             for filename in os.listdir(class_path):
                 if filename.endswith(".jpg") or filename.endswith(".jpeg") or filename.endswith(".png"):
-                    img_path = class_path / filename
+                    img_path = os.path.join(class_path, filename)
                     images.append(img_path)
 
             if images:
