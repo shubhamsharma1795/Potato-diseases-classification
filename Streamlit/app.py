@@ -5,6 +5,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import requests
 from io import BytesIO
+import os
 
 # Function to download the model file if not present
 def download_model(url, output_path):
