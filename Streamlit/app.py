@@ -3,37 +3,52 @@ import numpy as np
 from PIL import Image
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
+import requests
+from io import BytesIO
 
-# Load the trained model
-try:
-    model = load_model('potatoes.h5')
-    st.write("Model loaded successfully.")
-except Exception as e:
-    st.error(f"Failed to load model: {e}")
+# Function to download the model file if not present
+def download_model(url, output_path):
+    if not os.path.exists(output_path):
+        with st.spinner('Downloading model... Please wait...'):
+            r = requests.get(url, stream=True)
+            if r.status_code == 200:
+                with open(output_path, 'wb') as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                st.success('Model downloaded successfully!')
+            else:
+                st.error(f'Failed to download the model file. Status code: {r.status_code}. Check the URL or network.')
+                return False
+    return True
+
+# Set the path and URL for the model
+model_path = 'potatoes.h5'
+model_url = 'https://drive.google.com/uc?export=download&id=1WmP7hY1jd6joUqwM78PYvLQ6IswET_xy'
+
+# Ensure model is downloaded
+if download_model(model_url, model_path):
+    # Load the trained model
+    try:
+        model = load_model(model_path)
+        st.write("Model loaded successfully.")
+    except Exception as e:
+        st.error(f"Failed to load model: {e}")
+        st.stop()
+else:
+    st.stop()
 
 # Function to preprocess the image
 def preprocess_image(image_file):
-    try:
-        img = image.load_img(image_file, target_size=(224, 224))
-        img_array = image.img_to_array(img)
-        img_array = np.expand_dims(img_array, axis=0)
-        return img_array
-    except Exception as e:
-        st.error(f"Error in image preprocessing: {e}")
-        return None
+    img = image.load_img(image_file, target_size=(224, 224))
+    img_array = image.img_to_array(img)
+    img_array = np.expand_dims(img_array, axis=0)
+    return img_array
 
 # Function to make predictions
 def predict_disease(image_file):
-    try:
-        processed_image = preprocess_image(image_file)
-        if processed_image is not None:
-            prediction = model.predict(processed_image)
-            return prediction
-        else:
-            return None
-    except Exception as e:
-        st.error(f"Error in making prediction: {e}")
-        return None
+    processed_image = preprocess_image(image_file)
+    prediction = model.predict(processed_image)
+    return prediction
 
 # Streamlit app
 def main():
@@ -47,9 +62,8 @@ def main():
         st.write("")
 
         if st.button('Classify'):
-            st.write("Classifying...")
-            prediction = predict_disease(uploaded_file)
-            if prediction is not None:
+            with st.spinner('Classifying...'):
+                prediction = predict_disease(uploaded_file)
                 disease_class = np.argmax(prediction)
                 if disease_class == 0:
                     st.write("Prediction: Early Blight")
@@ -57,10 +71,6 @@ def main():
                     st.write("Prediction: Late Blight")
                 else:
                     st.write("Prediction: Healthy Potato Leaf")
-            else:
-                st.write("Failed to make a prediction. Check earlier errors.")
-    else:
-        st.write("Please upload an image of a potato leaf.")
 
 if __name__ == '__main__':
     main()
